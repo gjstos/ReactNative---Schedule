@@ -20,29 +20,23 @@ module.exports = app => {
                 .returning('userId')
                 .then((rows) => {
                     userId = rows[0]
-                    switch (req.body.typeUser) {
-                        case 'atendente':
-                            app.db('attendant')
-                                .insert({
-                                    userId: userId,
-                                    attendantRegistry: req.body.registry
-                                })
-                                .then(_ => res.status(204).send())
-                                .catch(err => res.status(400).json(err))
-                        case 'medico':
-                            app.db('doctor')
-                                .insert({
-                                    userId: userId,
-                                    medicalRegistry: req.body.registry
-                                })
-                                .then(_ => res.status(204).send())
-                                .catch(err => res.status(400).json(err))
-                        default:
-                            err => res.status(400).json(err)
+                    if (req.body.typeUser === 'atendente') {
+                        app.db('attendant')
+                            .insert({
+                                userId: userId,
+                                attendantRegistry: req.body.registry
+                            }).then(_ => res.status(204).send())
+                            .catch(err => res.status(400).send(err))
+                    } else {
+                        app.db('doctor')
+                            .insert({
+                                userId: userId,
+                                medicalRegistry: req.body.registry
+                            }).then(_ => res.status(204).send())
+                            .catch(err => res.status(400).send(err))
                     }
                 })
                 .catch(err => res.status(400).send(err))
-
         })
     }
 

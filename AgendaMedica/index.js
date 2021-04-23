@@ -4,6 +4,6 @@
 
 import {AppRegistry} from 'react-native';
 import {name as appName} from './app.json';
-import TaskList from './src/screens/TaskList';
+import Navigator from './src/Navigator'
 
-AppRegistry.registerComponent(appName, () => TaskList);
+AppRegistry.registerComponent(appName, () => Navigator);
