@@ -14,6 +14,9 @@ import moment from 'moment'
 import 'moment/locale/pt-br'
 import Icon from 'react-native-vector-icons/FontAwesome'
 import ActionButton from 'react-native-action-button'
+import AsyncStorage from '@react-native-community/async-storage'
+import axios from 'axios'
+import { server, showError } from '../common';
 
 import commonStyles from '../commonStyles'
 import Task from '../components/Task'
@@ -29,27 +32,7 @@ const initialState = {
     showAddTask: false,
     visibleTasks: [],
     typeAppoint: "Primeira consulta",
-    tasks: [{
-        id: '0001',
-        name: 'André',
-        apptType: 'Primeira Consulta',
-        estimatedAt: new Date(),
-        doneAt: null,
-        regPacient: '222',
-        shift: 'Manhã',
-        room: '2',
-        observations: '',
-    }, {
-        id: '0002',
-        name: 'Carlos',
-        apptType: 'Retorno',
-        regPacient: '222',
-        estimatedAt: new Date(),
-        doneAt: null,
-        shift: 'Tarde',
-        room: '2',
-        observations: '',
-    },]
+    tasks: []
 }
 
 export default class TaskList extends Component {
@@ -58,15 +41,28 @@ export default class TaskList extends Component {
     }
 
     componentDidMount = async () => {
-        // const stateString = await AsyncStorage.getItem('tasksState')
-        // const savedState = JSON.parse(stateString) || initialState
-        // this.setState({
-        //     showDoneTasks: savedState.showDoneTasks
-        // }, this.filterTasks)
+        const stateString = await AsyncStorage.getItem('tasksState')
+        const savedState = JSON.parse(stateString) || initialState
+        this.setState({
+            showDoneTasks: savedState.showDoneTasks
+        }, this.filterTasks)
 
-        // this.loadTasks()
+        this.loadTasks()
 
         this.filterTasks()
+    }
+
+    loadTasks = async () => {
+        try {
+            const maxDate = moment()
+                // .add({ days: this.props.daysAhead})
+                .format('YYYY-MM-DD 23:59:59')
+            const res = await axios.get(`${server}/appointments?date=${maxDate}`)
+            
+            this.setState({ tasks: res.data }, this.filterTasks)
+        } catch(e) {
+            showError(e)
+        }
     }
 
     filterTasks = () => {
@@ -79,64 +75,53 @@ export default class TaskList extends Component {
         }
 
         this.setState({ visibleTasks })
-        // AsyncStorage.setItem('tasksState', JSON.stringify({
-        //     showDoneTasks: this.state.showDoneTasks
-        // }))
+        AsyncStorage.setItem('tasksState', JSON.stringify({
+            showDoneTasks: this.state.showDoneTasks
+        }))
     }
 
     toggleFilter = () => {
         this.setState({ showDoneTasks: !this.state.showDoneTasks }, this.filterTasks)
     }
 
-    toggleTask = taskId => {
-        const tasks = [...this.state.tasks]
-        tasks.forEach(task => {
-            if (task.id === taskId) {
-                task.doneAt = task.doneAt ? null : new Date();
-            }
-        })
 
-        this.setState({ tasks: tasks }, this.filterTasks)
+    toggleTask = async taskId => {
+        try {
+            await axios.put(`${server}/appointments/${taskId}/toggle`)
+            this.loadTasks()
+        } catch(e) {
+            showError(e)
+        }
     }
 
-    addTask = async appointment => {
-        const tasks = [...this.state.tasks]
-        tasks.push({
-            id: Math.random(),
-            name: appointment.name,
-            regPacient: appointment.regPacient,
-            apptType: appointment.type,
-            estimatedAt: new Date(),
-            doneAt: null,
-            shift: appointment.turn,
-            room: appointment.room,
-            observations: appointment.situation,
-        })
 
-        this.setState({ tasks, showAddTask: false }, this.filterTasks)
+    addTask = async appointment => {    
+        try {
+            await axios.post(`${server}/appointments`, {
+                name: appointment.name,
+                apptType: appointment.type,
+                shift: appointment.shift,
+                room: appointment.room,
+                situation: appointment.situation,
+                estimatedAt: appointment.estimateAt,
+                regPatient: appointment.regPatient,
+            })
 
-        // try {
-        //     await axios.post(`${server}/tasks`, {
-        //        desc: newTask.desc,
-        //        estimateAt: newTask.date 
-        //     })
+            this.setState({ showAddTask: false }, this.loadTasks)
+        } catch(e) {
+            showError(e)
+        }
 
-        //     this.setState({ showAddTask: false }, this.loadTasks)
-        // } catch(e) {
-        //     showError(e)
-        // }
+        this.setState({ tasks: tasks, showAddTask: false }, this.filterTasks)
     }
 
     deleteTask = async taskId => {
-        const tasks = this.state.tasks.filter(task => task.id != taskId)
-        this.setState({tasks}, this.filterTasks)
-
-        // try {
-        //     await axios.delete(`${server}/tasks/${taskId}`)
-        //     this.loadTasks()
-        // } catch(e) {
-        //     showError(e)
-        // }
+        try {
+            await axios.delete(`${server}/appointments/${taskId}`)
+            this.loadTasks()
+        } catch(e) {
+            showError(e)
+        }
     }
 
     getImage = () => {
@@ -186,7 +171,7 @@ export default class TaskList extends Component {
                 </ImageBackground>
                 <View style={styles.taskList}>
                     <FlatList data={this.state.visibleTasks}
-                        keyExtractor={item => `${item.id}`}
+                        keyExtractor={item => `${item.appointmentId}`}
                         renderItem={({ item }) => <Task {...item} onToggleTask={this.toggleTask} onDelete={this.deleteTask}/>} />
                 </View>
                 <ActionButton buttonColor={this.getColor()}>

@@ -19,7 +19,7 @@ export default props => {
     const doneOrNotStyle = props.doneAt != null ?
         { textDecorationLine: 'line-through' } : {}
 
-    const typeAppointment = props.apptType === 'Primeira Consulta'
+    const typeAppointment = props.apptType === 'Primeira consulta'
         ? {
             backgroundColor: commonStyles.colors.first,
             paddingLeft: 2,
@@ -36,7 +36,7 @@ export default props => {
     const getRightContent = () => {
         return (
             <TouchableOpacity style={styles.right}
-                onPress={() => props.onDelete && props.onDelete(props.id)}>
+                onPress={() => props.onDelete && props.onDelete(props.appointmentId)}>
                 <Icon name="trash" size={30} color='#FFF' />
             </TouchableOpacity>
         )
@@ -70,16 +70,16 @@ export default props => {
         <Swipeable
             renderRightActions={getRightContent}
             renderLeftActions={getLeftContent}
-            onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.id)}>
+            onSwipeableLeftOpen={() => props.onDelete && props.onDelete(props.appointmentId)}>
             <View style={styles.container}>
                 <TouchableWithoutFeedback
-                    onPress={() => props.onToggleTask(props.id)}>
+                    onPress={() => props.onToggleTask(props.appointmentId)}>
                     <View style={styles.checkContainer}>
                         {getCheckView(props.doneAt)}
                     </View>
                 </TouchableWithoutFeedback>
                 <View>
-                    <Text style={[styles.desc, doneOrNotStyle]}>{props.id} | {props.name}</Text>
+                    <Text style={[styles.desc, doneOrNotStyle]}>{props.regPatient} | {props.name}</Text>
                     <Text style={[styles.desc, typeAppointment, doneOrNotStyle]}>Sala: {props.room} | {props.apptType}</Text>
                     <Text style={styles.date}>{formattedDate}</Text>
                 </View>

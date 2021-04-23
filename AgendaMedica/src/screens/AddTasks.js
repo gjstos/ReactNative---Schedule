@@ -27,12 +27,11 @@ export default class AddTask extends Component {
         return {
             type: this.props.typeApp,
             name: '',
-            regPacient: '',
-            turn: 'Manhã',
+            regPatient: '',
+            shift: 'Manhã',
             room: '',
             situation: 'marcado',
             estimateAt: new Date(),
-            doneAt: null,
         }
     }
 
@@ -43,7 +42,7 @@ export default class AddTask extends Component {
                 value={this.state.estimateAt}
                 onChange={(_, date) => {
                     date = date ? date : new Date()
-                    this.setState({ date, showDatePicker: false })
+                    this.setState({ estimateAt: date, showDatePicker: false })
                 }}
             />
         )
@@ -94,7 +93,10 @@ export default class AddTask extends Component {
                         <Icon name="close" style={styles.buttonCancel} />
                     </TouchableOpacity>
                     <View style={styles.blank}></View>
-                    <TouchableOpacity style={[(this.state.type === "Primeira consulta" ? styles.buttonF : styles.buttonS)]} onPress={this.save}>
+                    <TouchableOpacity 
+                        style={[(this.state.type === "Primeira consulta" ? styles.buttonF : styles.buttonS)]} 
+                        onPress={this.save}
+                    >
                         <Text style={styles.textButton}>Salvar</Text>
                     </TouchableOpacity>
                 </View>
@@ -124,8 +126,8 @@ export default class AddTask extends Component {
                     <View style={styles.side}>
                         <Icon name="user" style={styles.icons} color={(this.state.type === "Primeira consulta" ? commonStyles.colors.first : commonStyles.colors.return)} />
                         <TextInput keyboardType="numeric" placeholder="Registro Paciente" style={styles.inputNum}
-                            onChangeText={regPacient => this.setState({ regPacient })}
-                            value={this.regPacient} />
+                            onChangeText={regPatient => this.setState({ regPatient })}
+                            value={this.regPatient} />
                     </View>
 
                     <View style={styles.side}>

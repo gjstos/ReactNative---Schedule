@@ -25,7 +25,7 @@ class Entry extends Component {
                 <View style={styles.header2}></View>
                 <View style={styles.image}>
                     <Image source={Logo}/>
-                    <Text style={styles.textImage}>AGENDA MÉDICA</Text>
+                    <Text style={styles.textImage}>AGENDA</Text>
                     <Text style={styles.textImage}>DIGITAL</Text>
                 </View>
                 <View style={styles.header3}></View>
@@ -42,7 +42,7 @@ class Entry extends Component {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.footer}>
-                    <Text style={styles.footerText}>Agenda Médica Digital ©</Text>
+                    <Text style={styles.footerText}>Agenda Digital ©</Text>
                     <Text style={styles.footerText}>Este software é gratuito e OpenSource, versões modificadas devem se manter gratuitas, estando proibida a comercialização.</Text>
                 </View>
             </View> 

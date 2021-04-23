@@ -7,9 +7,9 @@ import { server, showError, showSuccess } from '../common';
 // import { login } from "../services/auth"  
 
 const initialState = {
-    name: '',
+    name: 'teste',
     registry: '',
-    password: '',
+    password: 'teste',
     typeUser: '',
     confirmPassword: '',
     error: ''
@@ -18,6 +18,7 @@ const initialState = {
 class Auth extends Component {
     state = {
         stageNew: this.props.navigation.state.params.stageNew,
+        // stageNew: true,
         ...initialState
     };
 
@@ -66,6 +67,17 @@ class Auth extends Component {
     };
 
     render() {
+        const validations =[]
+        validations.push(this.state.name)
+        validations.push(this.state.password)
+
+        if(this.state.stageNew) {
+            validations.push(this.state.name && this.state.name.trim().length >= 3)
+            validations.push(this.state.registry)
+        }
+
+        const validForm = validations.reduce((t,a) => t && a)
+
         return (
             <View style={styles.container}>
                 <Text style={styles.title}>
@@ -111,8 +123,9 @@ class Auth extends Component {
           />
         )*/}
                 <TouchableOpacity
+                disabled={!validForm}
                     onPress={this.signinOrSignup} // Chamar função login ou registro
-                    style={styles.buttom}>
+                    style={[styles.buttom, validForm ? {} : {backgroundColor: '#CECECE', borderColor: '#CECECE',}]}>
                     <Text style={styles.textButtom}>
                         {this.state.stageNew ? 'Registrar' : 'Entrar'}
                     </Text>

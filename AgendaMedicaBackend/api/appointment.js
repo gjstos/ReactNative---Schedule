@@ -4,24 +4,25 @@ module.exports = app => {
     const getAppointment = (req, res) => {
         const date = req.query.date ? req.query.date
             : moment().endOf('day').toDate()
-
-        app.db('appointment')
-            .where({ userId: req.user.userId })
+        
+        app.db
+            .from('appointment')
+            .where('appointment.userId', '=', req.user.userId)
             .where('estimatedAt', '<=', date)
-            .orderBy('estimatedAt')
-            .then(appointment => res.json(appointment))
-            .catch(err => res.status(400).json(err))
+            .innerJoin('patient', 'appointment.patientId', 'patient.patientId')
+            .then((a => res.status(200).send(a)))
     }
 
-    // Expects name, apptType, shift, room, situation, user.userId, estimatedAt
+    // Expects name, apptType, shift, room, situation, user.userId, estimatedAt, regPatient
     const save = (req, res) => {
         if (!req.body.name.trim() || !req.body.apptType.trim() || !req.body.shift.trim() || !req.body.room.trim() || !req.body.situation.trim()) {
             return res.status(400).send('Preencha todos os campos!')
         }
 
-        const patient = app.db('patient')
+        app.db('patient')
             .insert({
                 name: req.body.name,
+                regPatient: req.body.regPatient,
                 userId: req.user.userId,
             })
             .returning('patientId')
