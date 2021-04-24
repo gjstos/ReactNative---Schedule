@@ -1,0 +1,5 @@
+// TODO renomear para .env e digitar um conjunto de caracteres para montar chave de autenticação
+
+module.exports = {
+    authSecret: ''
+}

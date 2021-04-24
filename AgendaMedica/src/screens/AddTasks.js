@@ -112,7 +112,7 @@ export default class AddTask extends Component {
 
                     <View style={styles.side}>
                         <Icon name="adjust" style={styles.icons} color={(this.state.type === "Primeira consulta" ? commonStyles.colors.first : commonStyles.colors.return)} />
-                        <Text style={styles.textTurn}>Turno da </Text>
+                        <Text style={styles.textTurn}>Turno da Manhã</Text>
                         {/* <Picker
                             selectedValue={this.state.turn}
                             style={styles.pickTurn}
