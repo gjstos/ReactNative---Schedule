@@ -7,7 +7,7 @@ import {
     FlatList,
     TouchableOpacity,
     Platform,
-    Alert
+    LogBox
 } from 'react-native'
 
 import moment from 'moment'
@@ -55,12 +55,12 @@ export default class TaskList extends Component {
     loadTasks = async () => {
         try {
             const maxDate = moment()
-                // .add({ days: this.props.daysAhead})
+                .add({ days: this.props.daysAhead })
                 .format('YYYY-MM-DD 23:59:59')
             const res = await axios.get(`${server}/appointments?date=${maxDate}`)
-            
+
             this.setState({ tasks: res.data }, this.filterTasks)
-        } catch(e) {
+        } catch (e) {
             showError(e)
         }
     }
@@ -89,13 +89,13 @@ export default class TaskList extends Component {
         try {
             await axios.put(`${server}/appointments/${taskId}/toggle`)
             this.loadTasks()
-        } catch(e) {
+        } catch (e) {
             showError(e)
         }
     }
 
 
-    addTask = async appointment => {    
+    addTask = async appointment => {
         try {
             await axios.post(`${server}/appointments`, {
                 name: appointment.name,
@@ -108,7 +108,7 @@ export default class TaskList extends Component {
             })
 
             this.setState({ showAddTask: false }, this.loadTasks)
-        } catch(e) {
+        } catch (e) {
             showError(e)
         }
 
@@ -119,14 +119,14 @@ export default class TaskList extends Component {
         try {
             await axios.delete(`${server}/appointments/${taskId}`)
             this.loadTasks()
-        } catch(e) {
+        } catch (e) {
             showError(e)
         }
     }
 
     getImage = () => {
         // switch(this.props.daysAhead) {
-        switch (0) {
+        switch (5) {
             case 0: return todayImage
             case 1: return tomorrowImage
             case 7: return weekImage
@@ -135,8 +135,7 @@ export default class TaskList extends Component {
     }
 
     getColor = () => {
-        // switch (this.props.daysAhead) {
-        switch (0) {
+        switch (this.props.daysAhead) {
             case 0: return commonStyles.colors.today
             case 1: return commonStyles.colors.tomorrow
             case 7: return commonStyles.colors.week
@@ -145,6 +144,7 @@ export default class TaskList extends Component {
     }
 
     render() {
+        LogBox.ignoreLogs(['Warning: ...']);
         const today = moment().locale('pt-br').format('ddd, D [de] MMMM');
         return (
             <View style={styles.container}>
@@ -157,30 +157,35 @@ export default class TaskList extends Component {
                     <View style={styles.iconBar}>
                         <TouchableOpacity onPress={() => this.props.navigation.openDrawer()}>
                             <Icon name='bars'
-                                size={20} color={commonStyles.colors.default} />
+                                size={30} color={commonStyles.colors.default} />
                         </TouchableOpacity>
                         <TouchableOpacity onPress={this.toggleFilter}>
                             <Icon name={this.state.showDoneTasks ? 'eye' : 'eye-slash'}
-                                size={20} color={commonStyles.colors.default} />
+                                size={30} color={commonStyles.colors.default} />
                         </TouchableOpacity>
                     </View>
                     <View style={styles.titleBar}>
-                        <Text style={styles.title}>{this.props.title || "Hoje"}</Text>
-                        <Text style={styles.subtitle}>{today}</Text>
+                        <Text style={styles.title}>{this.props.title}</Text>
+                        <Text style={styles.subtitle}>
+                            {moment().add({ days: this.props.daysAhead }).locale('pt-br').format('ddd, D [de] MMMM')}
+                        </Text>
                     </View>
                 </ImageBackground>
+                <View backgroundColor={this.getColor()} style={styles.situation}></View>
                 <View style={styles.taskList}>
                     <FlatList data={this.state.visibleTasks}
                         keyExtractor={item => `${item.appointmentId}`}
-                        renderItem={({ item }) => <Task {...item} onToggleTask={this.toggleTask} onDelete={this.deleteTask}/>} />
+                        renderItem={({ item }) => <Task {...item} onToggleTask={this.toggleTask} onDelete={this.deleteTask} />} />
                 </View>
-                <ActionButton buttonColor={this.getColor()}>
+                <ActionButton buttonColor={this.getColor()} >
                     <ActionButton.Item buttonColor={commonStyles.colors.return} title="Retorno"
                         onPress={() => { this.setState({ showAddTask: true, typeAppoint: "Retorno" }) }}>
                         <Icon name="calendar-o" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
                     <ActionButton.Item buttonColor={commonStyles.colors.first} title="Consulta"
-                        onPress={() => { this.setState({ showAddTask: true, typeAppoint: "Primeira consulta" }) }}>
+                        onPress={() => {
+                            this.setState({ showAddTask: true, typeAppoint: "Primeira consulta" })
+                        }}>
                         <Icon name="calendar" style={styles.actionButtonIcon} />
                     </ActionButton.Item>
                 </ActionButton>
@@ -207,15 +212,15 @@ const styles = StyleSheet.create({
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.default,
         fontSize: 50,
-        marginLeft: 20,
-        marginBottom: 20
+        marginBottom: 10,
+        textAlign: 'center'
     },
     subtitle: {
         fontFamily: commonStyles.fontFamily,
         color: commonStyles.colors.default,
         fontSize: 20,
-        marginLeft: 20,
-        marginBottom: 30
+        marginBottom: 50,
+        textAlign: 'center'
     },
     iconBar: {
         flexDirection: 'row',
@@ -227,5 +232,11 @@ const styles = StyleSheet.create({
         fontSize: 20,
         height: 22,
         color: 'white',
+    },
+    situation: {
+        flex: 0.2,
+        borderTopWidth: 0.4,
+        borderBottomWidth: 0.4,
+        borderColor: 'white',
     },
 });

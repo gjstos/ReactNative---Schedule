@@ -7,9 +7,9 @@ import { server, showError, showSuccess } from '../common';
 // import { login } from "../services/auth"  
 
 const initialState = {
-    name: 'teste',
+    name: '',
     registry: '',
-    password: 'teste',
+    password: '',
     typeUser: '',
     confirmPassword: '',
     error: ''

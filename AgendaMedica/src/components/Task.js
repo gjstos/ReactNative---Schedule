@@ -29,7 +29,7 @@ export default props => {
             paddingLeft: 2,
         }
 
-    const date = props.doneAt ? props.doneAt : props.estimateAt
+    const date = props.doneAt ? props.doneAt : props.estimatedAt
     const formattedDate = moment(date).locale('pt-br')
         .format('ddd, D [de] MMMM')
 
