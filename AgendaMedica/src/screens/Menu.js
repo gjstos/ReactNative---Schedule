@@ -1,10 +1,10 @@
-import React from 'react'
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { DrawerNavigatorItems } from 'react-navigation-drawer'
-import Logo from '../../assets/imgs/icon.png'
+import React from "react"
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native"
+import { DrawerNavigatorItems } from "react-navigation-drawer"
+import Logo from "../../assets/imgs/icon.png"
 
-import commonStyles from '../commonStyles'
-import axios from 'axios';
+import commonStyles from "../commonStyles"
+import axios from "axios";
 
 function Menu({...props}) {
 
