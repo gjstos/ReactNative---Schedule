@@ -50,8 +50,14 @@
         "react-native/no-color-literals": 2,
         "react-native/no-raw-text": 2,
         "no-duplicate-case": "error",
-        "block-scoped-var": "error",
         "default-case": "error",
-        "no-redeclare": "error"
+        "no-redeclare": "error",
+        "no-unused-vars": "error",
+        "react/prop-types": "off", 
+        "max-len": "off",
+        "no-invalid-this": "off",
+        "operator-linebreak": "off",
+        "eol-last": "off",
+        "no-unused-expressions": "error"
     }
 }
