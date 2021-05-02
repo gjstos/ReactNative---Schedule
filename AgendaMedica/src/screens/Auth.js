@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
-import { Alert, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import commonStyles from '../commonStyles';
 import AuthInput from '../components/AuthInput';
 import axios from 'axios';
 import { server, showError, showSuccess } from '../common';
-// import { login } from "../services/auth"  
 
 const initialState = {
     name: '',
@@ -18,11 +17,13 @@ const initialState = {
 class Auth extends Component {
     state = {
         stageNew: this.props.navigation.state.params.stageNew,
-        // stageNew: true,
         ...initialState
     };
 
-
+    /**
+     * Utilizado para realizar o logout do usuário atual
+     * @async
+     */
     signin = async () => {
         try {
             const res = await axios.post(`${server}/signin`, {
@@ -30,7 +31,7 @@ class Auth extends Component {
                 password: this.state.password,
             })
 
-            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}` 
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
             this.props.navigation.navigate('Home'); // Próxima tela desejada
         }
         catch (err) {
@@ -38,6 +39,10 @@ class Auth extends Component {
         }
     };
 
+    /**
+     * Utilizado para realizar o login do usuário
+     * @async
+     */
     signup = async () => {
         try {
             await axios.post(`${server}/signup`, {
@@ -54,6 +59,10 @@ class Auth extends Component {
         }
     };
 
+    /**
+     * Verifica o estado da tela para saber se o usuário irá realizar ou o login ou o cadastro.
+     * @async
+     */
     signinOrSignup = async () => {
         if (this.state.stageNew) {
             this.signup();
@@ -62,21 +71,24 @@ class Auth extends Component {
         }
     };
 
+    /**
+     * Cancela a ação anterior do usuário.
+     */
     cancel = () => {
         this.props.navigation.navigate('Entry');
     };
 
     render() {
-        const validations =[]
+        const validations = []
         validations.push(this.state.name)
         validations.push(this.state.password)
 
-        if(this.state.stageNew) {
+        if (this.state.stageNew) {
             validations.push(this.state.name && this.state.name.trim().length >= 3)
             validations.push(this.state.registry)
         }
 
-        const validForm = validations.reduce((t,a) => t && a)
+        const validForm = validations.reduce((t, a) => t && a)
 
         return (
             <View style={styles.container}>
@@ -113,26 +125,18 @@ class Auth extends Component {
                     value={this.state.password}
                     onChangeText={password => this.setState({ password })}
                 />
-                {/*this.state.stageNew && (
-          <AuthInput
-            placeholder="Confirme sua senha"
-            style={styles.input}
-            secureTextEntry={true}
-            value={this.state.confirmPassword}
-            onChangeText={confirmPassword => this.setState({confirmPassword})}
-          />
-        )*/}
+
                 <TouchableOpacity
-                disabled={!validForm}
+                    disabled={!validForm}
                     onPress={this.signinOrSignup} // Chamar função login ou registro
-                    style={[styles.buttom, validForm ? {} : {backgroundColor: '#CECECE', borderColor: '#CECECE',}]}>
-                    <Text style={styles.textButtom}>
+                    style={[styles.button, validForm ? {} : { backgroundColor: '#CECECE', borderColor: '#CECECE', }]}>
+                    <Text style={styles.textButton}>
                         {this.state.stageNew ? 'Registrar' : 'Entrar'}
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={this.cancel}
-                    style={styles.buttomCancel}>
+                    style={styles.buttonCancel}>
                     <Text style={styles.textCancel}>Cancelar</Text>
                 </TouchableOpacity>
             </View>
@@ -153,17 +157,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: commonStyles.colors.secondary,
     },
-    // auth: {
-    //     padding: 10,
-    //     flex: 0.8,
-    //     justifyContent: 'center',
-    //     backgroundColor: '#FFD700',
-    //     width: '90%',
-    //     borderWidth: 2,
-    //     borderColor: '#FFF',
-    //     borderRadius: 10,
-    // },
-    buttom: {
+
+    button: {
         marginTop: 10,
         padding: 10,
         backgroundColor: '#FFF',
@@ -174,7 +169,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 10,
     },
-    buttomCancel: {
+    buttonCancel: {
         marginTop: 10,
         padding: 10,
         backgroundColor: commonStyles.colors.secondary,
@@ -185,7 +180,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 10,
     },
-    textButtom: {
+    textButton: {
         fontSize: 20,
         color: commonStyles.colors.primary,
         fontWeight: 'bold',

@@ -1,0 +1,266 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> screens/Entry.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="AuthInput.html">AuthInput</a></li><li><a href="Entry.html">Entry</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="Task.html">Task</a></li><li><a href="TaskList.html">TaskList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showSuccess">showSuccess</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>screens/Entry.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import commonStyles from '../commonStyles'
+
+import Logo from '../../assets/imgs/icon.png'
+
+/**
+ * @namespace Entry
+ */
+class Entry extends Component {
+
+    /**
+     * Realiza a mudança da tela atual para a tela de login.
+     * 
+     * @memberof Entry
+     */
+    login = () => {
+        this.props.navigation.navigate('Auth', {
+            stageNew: false,
+        });
+    }
+
+    /**
+     * Realiza a mudança da tela atual para a tela de cadastro.
+     * 
+     * @memberof Entry
+     */
+    register = () => {
+        this.props.navigation.navigate('Auth', {
+            stageNew: true,
+        });
+    }
+
+    /**
+     * Renderiza o componente na tela.
+     *
+     * @function render
+     * @memberof Entry
+     * @returns {View}
+     */
+    render() {
+        return (
+            &lt;View style={styles.container}>
+                &lt;View style={styles.header1}>&lt;/View>
+                &lt;View style={styles.header2}>&lt;/View>
+                &lt;View style={styles.image}>
+                    &lt;Image source={Logo} />
+                    &lt;Text style={styles.textImage}>AGENDA&lt;/Text>
+                    &lt;Text style={styles.textImage}>DIGITAL&lt;/Text>
+                &lt;/View>
+                &lt;View style={styles.header3}>&lt;/View>
+                &lt;View style={styles.body}>
+                    &lt;TouchableOpacity
+                        onPress={this.login} // Chamar função login
+                        style={styles.buttonEntry}>
+                        &lt;Text style={styles.textEntry}>Entrar&lt;/Text>
+                    &lt;/TouchableOpacity>
+                    &lt;TouchableOpacity
+                        onPress={this.register} // Enviar para função que leva a registrar
+                        style={styles.buttonRegistry}>
+                        &lt;Text style={styles.textRegistry}>Registrar&lt;/Text>
+                    &lt;/TouchableOpacity>
+                &lt;/View>
+                &lt;View style={styles.footer}>
+                    &lt;Text style={styles.footerText}>Agenda Digital ©&lt;/Text>
+                    &lt;Text style={styles.footerText}>Este software é gratuito e OpenSource, versões modificadas devem se manter gratuitas, estando proibida a comercialização.&lt;/Text>
+                &lt;/View>
+            &lt;/View>
+        )
+    }
+}
+
+const styles = StyleSheet.create({
+    container: {
+        height: '100%',
+    },
+    header1: {
+        flex: 0.3,
+        backgroundColor: commonStyles.colors.secondary,
+    },
+    header2: {
+        flex: 0.1,
+        backgroundColor: commonStyles.colors.primary,
+    },
+    header3: {
+        flex: 0.1,
+        backgroundColor: commonStyles.colors.secondary,
+    },
+    image: {
+        flex: 4,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    textImage: {
+        fontSize: 27,
+        fontWeight: 'bold',
+        color: commonStyles.colors.primary,
+    },
+    body: {
+        flex: 2,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: commonStyles.colors.primary,
+    },
+    buttonEntry: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: 'white',
+        borderWidth: 2,
+        borderColor: 'white',
+        width: '60%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    buttonRegistry: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: commonStyles.colors.primary,
+        borderWidth: 2,
+        borderColor: '#FFF',
+        width: '60%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    textEntry: {
+        fontSize: 20,
+        color: commonStyles.colors.primary,
+        fontWeight: 'bold',
+    },
+    textRegistry: {
+        fontSize: 20,
+        color: '#FFF',
+        fontWeight: 'bold',
+    },
+    footer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: commonStyles.colors.primary,
+    },
+    footerText: {
+        fontSize: 9.5,
+        color: 'white',
+        width: '95%',
+        textAlign: 'center',
+    },
+})
+
+export default Entry</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>

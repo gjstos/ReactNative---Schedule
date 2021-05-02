@@ -1,0 +1,434 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> screens/TaskList.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="AuthInput.html">AuthInput</a></li><li><a href="Entry.html">Entry</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="Task.html">Task</a></li><li><a href="TaskList.html">TaskList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showSuccess">showSuccess</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>screens/TaskList.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react'
+import {
+    View,
+    Text,
+    ImageBackground,
+    StyleSheet,
+    FlatList,
+    TouchableOpacity,
+    Platform,
+    LogBox
+} from 'react-native'
+
+import moment from 'moment'
+import 'moment/locale/pt-br'
+import Icon from 'react-native-vector-icons/FontAwesome'
+import ActionButton from 'react-native-action-button'
+import AsyncStorage from '@react-native-community/async-storage'
+import axios from 'axios'
+import { server, showError } from '../common';
+
+import commonStyles from '../commonStyles'
+import Task from '../components/Task'
+import AddTask from './AddTasks'
+
+import todayImage from '../../assets/imgs/today.jpg'
+import tomorrowImage from '../../assets/imgs/tomorrow.jpg'
+import weekImage from '../../assets/imgs/week.jpg'
+import monthImage from '../../assets/imgs/month.jpg'
+
+const initialState = {
+    showDoneTasks: true,
+    showAddTask: false,
+    visibleTasks: [],
+    typeAppoint: "Primeira consulta",
+    tasks: []
+}
+
+/**
+ * Classe responsável por gerir a tela que lista todas as consultas.
+ * @namespace TaskList
+ */
+export default class TaskList extends Component {
+    state = {
+        ...initialState
+    }
+
+    /**
+     * Verifica o estado do componente e executa as funções loadTasks e filterTasks.
+     * 
+     * @async
+     * @function componentDidMount
+     * @memberof TaskList
+     */
+    componentDidMount = async () => {
+        const stateString = await AsyncStorage.getItem('tasksState')
+        const savedState = JSON.parse(stateString) || initialState
+        this.setState({
+            showDoneTasks: savedState.showDoneTasks
+        }, this.filterTasks)
+
+        this.loadTasks()
+
+        this.filterTasks()
+    }
+
+
+    /**
+     * Acessa ao servidor para carregar a lista de consultas.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     * 
+     * @async
+     * @function loadTasks
+     * @memberof TaskList
+     */
+    loadTasks = async () => {
+        try {
+            const maxDate = moment()
+                .add({ days: this.props.daysAhead })
+                .format('YYYY-MM-DD 23:59:59')
+            const res = await axios.get(`${server}/appointments?date=${maxDate}`)
+
+            this.setState({ tasks: res.data }, this.filterTasks)
+        } catch (e) {
+            showError(e)
+        }
+    }
+
+    /**
+     * Verifica o estado do componente e executa as funções loadTasks e filterTasks.
+     * 
+     * @async
+     * @function filterTasks
+     * @memberof TaskList
+     */
+    filterTasks = () => {
+        let visibleTasks = null
+        if (this.state.showDoneTasks) {
+            visibleTasks = [...this.state.tasks]
+        } else {
+            const pending = task => task.doneAt === null
+            visibleTasks = this.state.tasks.filter(pending)
+        }
+
+        this.setState({ visibleTasks })
+        AsyncStorage.setItem('tasksState', JSON.stringify({
+            showDoneTasks: this.state.showDoneTasks
+        }))
+    }
+
+    /**
+     * Executa a atualização do estado da lista de consultas pelo filtro definido.
+     *
+     * @async
+     * @function toggleFilter
+     * @memberof TaskList
+     */
+    toggleFilter = () => {
+        this.setState({ showDoneTasks: !this.state.showDoneTasks }, this.filterTasks)
+    }
+
+    /**
+     * Executa a atualização do estado da lista de consultas pelo filtro definido.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     *
+     * @async
+     * @function toggleTask
+     * @memberof TaskList
+     */
+    toggleTask = async taskId => {
+        try {
+            await axios.put(`${server}/appointments/${taskId}/toggle`)
+            this.loadTasks()
+        } catch (e) {
+            showError(e)
+        }
+    }
+
+    /**
+     * Adiciona um consulta à lista de consultas.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     *
+     * @async
+     * @function addTask
+     * @memberof TaskList
+     */
+    addTask = async appointment => {
+        try {
+            await axios.post(`${server}/appointments`, {
+                name: appointment.name,
+                apptType: appointment.type,
+                shift: appointment.shift,
+                room: appointment.room,
+                situation: appointment.situation,
+                estimatedAt: appointment.estimateAt,
+                regPatient: appointment.regPatient,
+            })
+
+            this.setState({ showAddTask: false }, this.loadTasks)
+        } catch (e) {
+            showError(e)
+        }
+
+        this.setState({ tasks: tasks, showAddTask: false }, this.filterTasks)
+    }
+
+    /**
+     * Remove um consulta da lista de consultas.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     *
+     * @asyncCaso haja erro, será exibido uma mensagem para o usuário.
+     * @function deleteTask
+     * @memberof TaskList
+     */
+    deleteTask = async taskId => {
+        try {
+            await axios.delete(`${server}/appointments/${taskId}`)
+            this.loadTasks()
+        } catch (e) {
+            showError(e)
+        }
+    }
+
+    /**
+     * Remove um consulta da lista de consultas.
+     *
+     * @async
+     * @function deleteTask
+     * @memberof TaskList
+     * @returns {todayImage}
+     */
+    getImage = () => {
+        switch (5) {
+            case 0: return todayImage
+            case 1: return tomorrowImage
+            case 7: return weekImage
+            default: return monthImage
+        }
+    }
+
+    /**
+     * Retorna uma cor dependendo do dia escolhido pelo usuário.
+     *
+     * @async
+     * @function getColor
+     * @memberof TaskList
+     * @returns {string}
+     */
+    getColor = () => {
+        switch (this.props.daysAhead) {
+            case 0: return commonStyles.colors.today
+            case 1: return commonStyles.colors.tomorrow
+            case 7: return commonStyles.colors.week
+            default: return commonStyles.colors.month
+        }
+    }
+
+    /**
+     * Renderiza o componente na tela.
+     *
+     * @function render
+     * @memberof TaskList
+     * @returns {View}
+     */
+    render() {
+        LogBox.ignoreLogs(['Warning: ...']);
+        return (
+            &lt;View style={styles.container}>
+                &lt;AddTask isVisible={this.state.showAddTask}
+                    typeApp={this.state.typeAppoint}
+                    onCancel={() => this.setState({ showAddTask: false })}
+                    onSave={this.addTask} />
+                &lt;ImageBackground source={this.getImage()}
+                    style={styles.background}>
+                    &lt;View style={styles.iconBar}>
+                        &lt;TouchableOpacity onPress={() => this.props.navigation.openDrawer()}>
+                            &lt;Icon name='bars'
+                                size={30} color={commonStyles.colors.default} />
+                        &lt;/TouchableOpacity>
+                        &lt;TouchableOpacity onPress={this.toggleFilter}>
+                            &lt;Icon name={this.state.showDoneTasks ? 'eye' : 'eye-slash'}
+                                size={30} color={commonStyles.colors.default} />
+                        &lt;/TouchableOpacity>
+                    &lt;/View>
+                    &lt;View style={styles.titleBar}>
+                        &lt;Text style={styles.title}>{this.props.title}&lt;/Text>
+                        &lt;Text style={styles.subtitle}>
+                            {moment().add({ days: this.props.daysAhead }).locale('pt-br').format('ddd, D [de] MMMM')}
+                        &lt;/Text>
+                    &lt;/View>
+                &lt;/ImageBackground>
+                &lt;View backgroundColor={this.getColor()} style={styles.situation}>&lt;/View>
+                &lt;View style={styles.taskList}>
+                    &lt;FlatList data={this.state.visibleTasks}
+                        keyExtractor={item => `${item.appointmentId}`}
+                        renderItem={({ item }) => &lt;Task {...item} onToggleTask={this.toggleTask} onDelete={this.deleteTask} />} />
+                &lt;/View>
+                &lt;ActionButton buttonColor={this.getColor()} >
+                    &lt;ActionButton.Item buttonColor={commonStyles.colors.return} title="Retorno"
+                        onPress={() => { this.setState({ showAddTask: true, typeAppoint: "Retorno" }) }}>
+                        &lt;Icon name="calendar-o" style={styles.actionButtonIcon} />
+                    &lt;/ActionButton.Item>
+                    &lt;ActionButton.Item buttonColor={commonStyles.colors.first} title="Consulta"
+                        onPress={() => {
+                            this.setState({ showAddTask: true, typeAppoint: "Primeira consulta" })
+                        }}>
+                        &lt;Icon name="calendar" style={styles.actionButtonIcon} />
+                    &lt;/ActionButton.Item>
+                &lt;/ActionButton>
+            &lt;/View>
+        )
+    }
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    },
+    background: {
+        flex: 3
+    },
+    taskList: {
+        flex: 7
+    },
+    titleBar: {
+        flex: 1,
+        justifyContent: 'flex-end'
+    },
+    title: {
+        fontFamily: commonStyles.fontFamily,
+        color: commonStyles.colors.default,
+        fontSize: 50,
+        marginBottom: 10,
+        textAlign: 'center'
+    },
+    subtitle: {
+        fontFamily: commonStyles.fontFamily,
+        color: commonStyles.colors.default,
+        fontSize: 20,
+        marginBottom: 50,
+        textAlign: 'center'
+    },
+    iconBar: {
+        flexDirection: 'row',
+        marginHorizontal: 20,
+        justifyContent: 'space-between',
+        marginTop: Platform.OS === 'ios' ? 40 : 10
+    },
+    actionButtonIcon: {
+        fontSize: 20,
+        height: 22,
+        color: 'white',
+    },
+    situation: {
+        flex: 0.2,
+        borderTopWidth: 0.4,
+        borderBottomWidth: 0.4,
+        borderColor: 'white',
+    },
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>

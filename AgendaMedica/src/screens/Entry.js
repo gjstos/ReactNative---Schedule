@@ -4,40 +4,60 @@ import commonStyles from '../commonStyles'
 
 import Logo from '../../assets/imgs/icon.png'
 
+/**
+ * @namespace Entry
+ */
 class Entry extends Component {
 
+    /**
+     * Realiza a mudança da tela atual para a tela de login.
+     * 
+     * @memberof Entry
+     */
     login = () => {
         this.props.navigation.navigate('Auth', {
             stageNew: false,
         });
     }
 
+    /**
+     * Realiza a mudança da tela atual para a tela de cadastro.
+     * 
+     * @memberof Entry
+     */
     register = () => {
         this.props.navigation.navigate('Auth', {
             stageNew: true,
         });
     }
 
+    /**
+     * Renderiza o componente na tela.
+     *
+     * @function render
+     * @memberof Entry
+     * @returns {View}
+     */
     render() {
         return (
             <View style={styles.container}>
                 <View style={styles.header1}></View>
                 <View style={styles.header2}></View>
                 <View style={styles.image}>
-                    <Image source={Logo}/>
+                    <Image source={Logo} />
                     <Text style={styles.textImage}>AGENDA</Text>
                     <Text style={styles.textImage}>DIGITAL</Text>
                 </View>
                 <View style={styles.header3}></View>
                 <View style={styles.body}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={this.login} // Chamar função login
-                        style={styles.buttomEntry}>
+                        style={styles.buttonEntry}>
                         <Text style={styles.textEntry}>Entrar</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={this.register} // Enviar para função que leva a registrar
-                        style={styles.buttomRegistry}>
+                        style={styles.buttonRegistry}>
                         <Text style={styles.textRegistry}>Registrar</Text>
                     </TouchableOpacity>
                 </View>
@@ -45,7 +65,7 @@ class Entry extends Component {
                     <Text style={styles.footerText}>Agenda Digital ©</Text>
                     <Text style={styles.footerText}>Este software é gratuito e OpenSource, versões modificadas devem se manter gratuitas, estando proibida a comercialização.</Text>
                 </View>
-            </View> 
+            </View>
         )
     }
 }
@@ -82,7 +102,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: commonStyles.colors.primary,
     },
-    buttomEntry: {
+    buttonEntry: {
         marginTop: 10,
         padding: 10,
         backgroundColor: 'white',
@@ -93,7 +113,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 10,
     },
-    buttomRegistry: {
+    buttonRegistry: {
         marginTop: 10,
         padding: 10,
         backgroundColor: commonStyles.colors.primary,

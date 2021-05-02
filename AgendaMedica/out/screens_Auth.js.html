@@ -1,0 +1,319 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> screens/Auth.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="AuthInput.html">AuthInput</a></li><li><a href="Entry.html">Entry</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="Task.html">Task</a></li><li><a href="TaskList.html">TaskList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showSuccess">showSuccess</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>screens/Auth.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import commonStyles from '../commonStyles';
+import AuthInput from '../components/AuthInput';
+import axios from 'axios';
+import { server, showError, showSuccess } from '../common';
+
+const initialState = {
+    name: '',
+    registry: '',
+    password: '',
+    typeUser: '',
+    confirmPassword: '',
+    error: ''
+}
+
+class Auth extends Component {
+    state = {
+        stageNew: this.props.navigation.state.params.stageNew,
+        ...initialState
+    };
+
+    /**
+     * Utilizado para realizar o logout do usuário atual
+     * @async
+     */
+    signin = async () => {
+        try {
+            const res = await axios.post(`${server}/signin`, {
+                name: this.state.name,
+                password: this.state.password,
+            })
+
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+            this.props.navigation.navigate('Home'); // Próxima tela desejada
+        }
+        catch (err) {
+            showError(err);
+        }
+    };
+
+    /**
+     * Utilizado para realizar o login do usuário
+     * @async
+     */
+    signup = async () => {
+        try {
+            await axios.post(`${server}/signup`, {
+                name: this.state.name,
+                typeUser: this.state.typeUser,
+                registry: this.state.registry,
+                password: this.state.password,
+            });
+
+            showSuccess('Usuário cadastrado com sucesso!');
+            this.setState({ stageNew: false, ...initialState });
+        } catch (err) {
+            showError(err)
+        }
+    };
+
+    /**
+     * Verifica o estado da tela para saber se o usuário irá realizar ou o login ou o cadastro.
+     * @async
+     */
+    signinOrSignup = async () => {
+        if (this.state.stageNew) {
+            this.signup();
+        } else {
+            this.signin()
+        }
+    };
+
+    /**
+     * Cancela a ação anterior do usuário.
+     */
+    cancel = () => {
+        this.props.navigation.navigate('Entry');
+    };
+
+    render() {
+        const validations = []
+        validations.push(this.state.name)
+        validations.push(this.state.password)
+
+        if (this.state.stageNew) {
+            validations.push(this.state.name &amp;&amp; this.state.name.trim().length >= 3)
+            validations.push(this.state.registry)
+        }
+
+        const validForm = validations.reduce((t, a) => t &amp;&amp; a)
+
+        return (
+            &lt;View style={styles.container}>
+                &lt;Text style={styles.title}>
+                    {this.state.stageNew ? 'Registro' : 'Entrar'}
+                &lt;/Text>
+
+                &lt;AuthInput
+                    placeholder="Nome"
+                    icon='user'
+                    style={styles.input}
+                    autoFocus={true}
+                    value={this.state.name}
+                    onChangeText={name => this.setState({ name })}
+                />
+                {this.state.stageNew &amp;&amp; (
+                    &lt;AuthInput
+                        placeholder="Registro"
+                        icon='at'
+                        style={styles.input}
+                        value={this.state.registry}
+                        onChangeText={registry => {
+                            this.setState({ registry })
+                            if (registry.length > 5) this.setState({ typeUser: 'medico' })
+                            else this.setState({ typeUser: 'atendente' })
+                        }}
+                    />
+                )}
+                &lt;AuthInput
+                    placeholder="Senha"
+                    style={styles.input}
+                    icon='lock'
+                    secureTextEntry={true}
+                    value={this.state.password}
+                    onChangeText={password => this.setState({ password })}
+                />
+
+                &lt;TouchableOpacity
+                    disabled={!validForm}
+                    onPress={this.signinOrSignup} // Chamar função login ou registro
+                    style={[styles.button, validForm ? {} : { backgroundColor: '#CECECE', borderColor: '#CECECE', }]}>
+                    &lt;Text style={styles.textButton}>
+                        {this.state.stageNew ? 'Registrar' : 'Entrar'}
+                    &lt;/Text>
+                &lt;/TouchableOpacity>
+                &lt;TouchableOpacity
+                    onPress={this.cancel}
+                    style={styles.buttonCancel}>
+                    &lt;Text style={styles.textCancel}>Cancelar&lt;/Text>
+                &lt;/TouchableOpacity>
+            &lt;/View>
+        );
+    }
+}
+
+const styles = StyleSheet.create({
+    title: {
+        color: commonStyles.colors.default,
+        fontSize: 20,
+        padding: 5,
+        fontWeight: 'bold',
+    },
+    container: {
+        flex: 3,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: commonStyles.colors.secondary,
+    },
+
+    button: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: '#FFF',
+        borderWidth: 2,
+        borderColor: '#FFF',
+        width: '60%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    buttonCancel: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: commonStyles.colors.secondary,
+        borderWidth: 2,
+        borderColor: commonStyles.colors.default,
+        width: '60%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: 10,
+    },
+    textButton: {
+        fontSize: 20,
+        color: commonStyles.colors.primary,
+        fontWeight: 'bold',
+    },
+    textCancel: {
+        fontSize: 20,
+        color: commonStyles.colors.default,
+        fontWeight: 'bold',
+    },
+    input: {
+        marginTop: 10,
+        width: '90%',
+        backgroundColor: '#EEE',
+        height: 40,
+        borderWidth: 1,
+        borderColor: '#EEE',
+        borderRadius: 10,
+    },
+});
+
+export default Auth;</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>

@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> components/Task.js</title>
+
+  <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="./build/entry.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto:100,400,700|Inconsolata,700" rel="stylesheet">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+  <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+  <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+  <link type="text/css" rel="stylesheet" href="">
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+
+  
+</head>
+
+
+
+<body class="layout small-header">
+    <div id="stickyNavbarOverlay"></div>
+    
+
+<div class="top-nav">
+    <div class="inner">
+        <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+        <div class="logo">
+            
+            
+        </div>
+        <div class="menu">
+            
+            <div class="navigation">
+                <a
+                    href="index.html"
+                    class="link"
+                >
+                    API Documentation
+                </a>
+                
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+    <div id="main">
+        <div
+            class="sidebar "
+            id="sidebarNav"
+        >
+            
+            <nav>
+                
+                    <h2><a href="index.html">Documentation</a></h2><div class="category"><h3>Namespaces</h3><ul><li><a href="AuthInput.html">AuthInput</a></li><li><a href="Entry.html">Entry</a></li><li><a href="global.html#Menu">Menu</a></li><li><a href="Navigator.html">Navigator</a></li><li><a href="Task.html">Task</a></li><li><a href="TaskList.html">TaskList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#showError">showError</a></li><li><a href="global.html#showSuccess">showSuccess</a></li></ul></div>
+                
+            </nav>
+        </div>
+        <div class="core" id="main-content-wrapper">
+            <div class="content">
+                <header class="page-title">
+                    <p>Source</p>
+                    <h1>components/Task.js</h1>
+                </header>
+                
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React from "react"
+import {
+    View,
+    Text,
+    StyleSheet,
+    TouchableWithoutFeedback,
+    TouchableOpacity,
+} from "react-native"
+import Swipeable from "react-native-gesture-handler/Swipeable"
+import Icon from "react-native-vector-icons/FontAwesome"
+
+import moment from "moment"
+import "moment/locale/pt-br"
+
+import commonStyles from "../commonStyles"
+
+/** 
+ * @namespace Task 
+ */
+export default (props) => {
+    const doneOrNotStyle = props.doneAt != null ?
+        { textDecorationLine: "line-through" } : {}
+
+    const typeAppointment = props.apptType === "Primeira consulta" ?
+        {
+            backgroundColor: commonStyles.colors.first,
+            paddingLeft: 2,
+        } :
+        {
+            backgroundColor: commonStyles.colors.return,
+            paddingLeft: 2,
+        }
+    /**
+     * @memberof Task
+     * @constant {date} date - Data da Consulta
+     */
+    const date = props.doneAt ? props.doneAt : props.estimatedAt
+    /**
+     * @memberof Task
+     * @constant {date} formattedDate - Formatação da Data
+     */
+    const formattedDate = moment(date).locale("pt-br")
+        .format("ddd, D [de] MMMM")
+
+    /**
+     * Exibe botão de cancelar consulta
+     * @function getRightContent 
+     * @memberof Task 
+     * @return {TouchableOpacity} - botão que permite cancelar consulta
+     */
+    const getRightContent = () => {
+        return (
+            &lt;TouchableOpacity style={styles.right}
+                onPress={() => props.onDelete &amp;&amp; props.onDelete(props.appointmentId)}>
+                &lt;Icon name="trash" size={30} color='#FFF' />
+            &lt;/TouchableOpacity>
+        )
+    }
+
+    /**
+     * Exibe ícone de cancelamento de consulta
+     * @function getLeftContent
+     * @memberof Task
+     * @return {View} - Ícone de cancelamento
+     */
+    const getLeftContent = () => {
+        return (
+            &lt;View style={styles.left}>
+                &lt;Icon name="trash" size={20} color='#FFF'
+                    style={styles.excludeIcon} />
+                &lt;Text style={styles.excludeText}>Cancelar&lt;/Text>
+            &lt;/View>
+        )
+    }
+
+    /**
+     * Utilizada para verificar se a consulta foi concluída
+     * @function getCheckView 
+     * @memberof Task
+     * @param {date} doneAt - Data de Conclusão da Consulta
+     * @return {View} View com estilo de pendente 
+     * @return {View} View com estilo concluído 
+     */
+    function getCheckView(doneAt) {
+        if (doneAt != null) {
+            return (
+                &lt;View style={styles.done}>
+                    &lt;Icon name='check' size={20} color='#FFF'>&lt;/Icon>
+                &lt;/View>
+            )
+        } else {
+            return (
+                &lt;View style={styles.pending}>&lt;/View>
+            )
+        }
+    }
+
+    return (
+        &lt;Swipeable
+            renderRightActions={getRightContent}
+            renderLeftActions={getLeftContent}
+            onSwipeableLeftOpen={() => props.onDelete &amp;&amp; props.onDelete(props.appointmentId)}>
+            &lt;View style={styles.container}>
+                &lt;TouchableWithoutFeedback
+                    onPress={() => props.onToggleTask(props.appointmentId)}>
+                    &lt;View style={styles.checkContainer}>
+                        {getCheckView(props.doneAt)}
+                    &lt;/View>
+                &lt;/TouchableWithoutFeedback>
+                &lt;View>
+                    &lt;Text style={[styles.desc, doneOrNotStyle]}>{props.regPatient} | {props.name}&lt;/Text>
+                    &lt;Text style={[styles.desc, typeAppointment, doneOrNotStyle]}>Sala: {props.room} | {props.apptType}&lt;/Text>
+                    &lt;Text style={styles.date}>{formattedDate}&lt;/Text>
+                &lt;/View>
+            &lt;/View>
+        &lt;/Swipeable>
+    )
+}
+
+/**
+ * @memberof Task
+ * @constant {StyleSheet} style - estilização do componente
+ */
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: "row",
+        borderColor: "#AAA",
+        borderBottomWidth: 1,
+        alignItems: "center",
+        paddingVertical: 10,
+        backgroundColor: "#FFF",
+    },
+    checkContainer: {
+        width: "20%",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    pending: {
+        height: 25,
+        width: 25,
+        borderRadius: 13,
+        borderWidth: 1,
+        borderColor: "#555",
+    },
+    done: {
+        height: 25,
+        width: 25,
+        borderRadius: 13,
+        backgroundColor: "#4D7031",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    desc: {
+        fontFamily: commonStyles.fontFamily,
+        color: commonStyles.colors.mainText,
+        fontSize: 15,
+    },
+    date: {
+        fontFamily: commonStyles.fontFamily,
+        color: commonStyles.colors.subText,
+        fontSize: 12,
+    },
+    right: {
+        backgroundColor: "red",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        paddingHorizontal: 20,
+    },
+    left: {
+        flex: 1,
+        backgroundColor: "red",
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    excludeIcon: {
+        marginLeft: 10,
+    },
+    excludeText: {
+        fontFamily: commonStyles.fontFamily,
+        color: "#FFF",
+        fontSize: 20,
+        margin: 10,
+    },
+})</code></pre>
+        </article>
+    </section>
+
+
+
+
+            </div>
+            
+            <footer class="footer">
+                <div class="content has-text-centered">
+                    <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.6</a></p>
+                    <p class="sidebar-created-by">
+                        <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+                        <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+                    </p>
+                </div>
+            </footer>
+            
+        </div>
+        <div id="side-nav" class="side-nav">
+        </div>
+    </div>
+<script src="scripts/app.min.js"></script>
+<script>PR.prettyPrint();</script>
+<script src="scripts/linenumber.js"> </script>
+
+</body>
+</html>

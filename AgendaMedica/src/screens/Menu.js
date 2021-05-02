@@ -1,23 +1,41 @@
-import React from 'react'
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
-import { DrawerNavigatorItems } from 'react-navigation-drawer'
-import Logo from '../../assets/imgs/icon.png'
+import React from "react"
+import { View, Text, Image, StyleSheet, TouchableOpacity } from "react-native"
+import { DrawerNavigatorItems } from "react-navigation-drawer"
+import Logo from "../../assets/imgs/icon.png"
 
-import commonStyles from '../commonStyles'
-import axios from 'axios';
+import commonStyles from "../commonStyles"
+import axios from "axios";
 
-function Menu({...props}) {
+/**
+ * @namespace Menu
+ * @param {any} props
+ * @returns {View}
+ */
+function Menu({ ...props }) {
 
-    // Função responsável por encerrar a sessão atual do usuário e voltar à tela inicial
+    /**
+     * Função responsável por encerrar a sessão atual do usuário e voltar à tela inicial.
+     * 
+     * @function signout
+     * @member Menu
+     * @returns {View} Tela de início do aplicativo.
+     */
     const signout = () => {
         delete axios.defaults.headers.common['Authorization']
         props.navigation.navigate('Entry')
     }
 
+    /**
+     * Renderiza o componente na tela.
+     *
+     * @function render
+     * @member Menu
+     * @returns {View}
+     */
     return (
         <View style={styles.container}>
             <View style={styles.userArea}>
-                <Image source={Logo} style={styles.logo}/>
+                <Image source={Logo} style={styles.logo} />
                 <Text style={styles.textLogo}>AGENDA DIGITAL</Text>
             </View>
             <DrawerNavigatorItems {...props} />

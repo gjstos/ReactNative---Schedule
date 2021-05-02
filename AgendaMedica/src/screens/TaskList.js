@@ -35,11 +35,22 @@ const initialState = {
     tasks: []
 }
 
+/**
+ * Classe responsável por gerir a tela que lista todas as consultas.
+ * @namespace TaskList
+ */
 export default class TaskList extends Component {
     state = {
         ...initialState
     }
 
+    /**
+     * Verifica o estado do componente e executa as funções loadTasks e filterTasks.
+     * 
+     * @async
+     * @function componentDidMount
+     * @memberof TaskList
+     */
     componentDidMount = async () => {
         const stateString = await AsyncStorage.getItem('tasksState')
         const savedState = JSON.parse(stateString) || initialState
@@ -52,6 +63,15 @@ export default class TaskList extends Component {
         this.filterTasks()
     }
 
+
+    /**
+     * Acessa ao servidor para carregar a lista de consultas.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     * 
+     * @async
+     * @function loadTasks
+     * @memberof TaskList
+     */
     loadTasks = async () => {
         try {
             const maxDate = moment()
@@ -65,6 +85,13 @@ export default class TaskList extends Component {
         }
     }
 
+    /**
+     * Verifica o estado do componente e executa as funções loadTasks e filterTasks.
+     * 
+     * @async
+     * @function filterTasks
+     * @memberof TaskList
+     */
     filterTasks = () => {
         let visibleTasks = null
         if (this.state.showDoneTasks) {
@@ -80,11 +107,25 @@ export default class TaskList extends Component {
         }))
     }
 
+    /**
+     * Executa a atualização do estado da lista de consultas pelo filtro definido.
+     *
+     * @async
+     * @function toggleFilter
+     * @memberof TaskList
+     */
     toggleFilter = () => {
         this.setState({ showDoneTasks: !this.state.showDoneTasks }, this.filterTasks)
     }
 
-
+    /**
+     * Executa a atualização do estado da lista de consultas pelo filtro definido.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     *
+     * @async
+     * @function toggleTask
+     * @memberof TaskList
+     */
     toggleTask = async taskId => {
         try {
             await axios.put(`${server}/appointments/${taskId}/toggle`)
@@ -94,7 +135,14 @@ export default class TaskList extends Component {
         }
     }
 
-
+    /**
+     * Adiciona um consulta à lista de consultas.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     *
+     * @async
+     * @function addTask
+     * @memberof TaskList
+     */
     addTask = async appointment => {
         try {
             await axios.post(`${server}/appointments`, {
@@ -115,6 +163,14 @@ export default class TaskList extends Component {
         this.setState({ tasks: tasks, showAddTask: false }, this.filterTasks)
     }
 
+    /**
+     * Remove um consulta da lista de consultas.
+     * Caso haja erro, será exibido uma mensagem para o usuário.
+     *
+     * @asyncCaso haja erro, será exibido uma mensagem para o usuário.
+     * @function deleteTask
+     * @memberof TaskList
+     */
     deleteTask = async taskId => {
         try {
             await axios.delete(`${server}/appointments/${taskId}`)
@@ -124,8 +180,15 @@ export default class TaskList extends Component {
         }
     }
 
+    /**
+     * Remove um consulta da lista de consultas.
+     *
+     * @async
+     * @function deleteTask
+     * @memberof TaskList
+     * @returns {todayImage}
+     */
     getImage = () => {
-        // switch(this.props.daysAhead) {
         switch (5) {
             case 0: return todayImage
             case 1: return tomorrowImage
@@ -134,6 +197,14 @@ export default class TaskList extends Component {
         }
     }
 
+    /**
+     * Retorna uma cor dependendo do dia escolhido pelo usuário.
+     *
+     * @async
+     * @function getColor
+     * @memberof TaskList
+     * @returns {string}
+     */
     getColor = () => {
         switch (this.props.daysAhead) {
             case 0: return commonStyles.colors.today
@@ -143,9 +214,15 @@ export default class TaskList extends Component {
         }
     }
 
+    /**
+     * Renderiza o componente na tela.
+     *
+     * @function render
+     * @memberof TaskList
+     * @returns {View}
+     */
     render() {
         LogBox.ignoreLogs(['Warning: ...']);
-        const today = moment().locale('pt-br').format('ddd, D [de] MMMM');
         return (
             <View style={styles.container}>
                 <AddTask isVisible={this.state.showAddTask}
